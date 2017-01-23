@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fila"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+
+    <TextView
+        android:text="Info1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/inforatio"
+        android:layout_weight="1"
+        android:textAlignment="center" />
+
+    <TextView
+        android:text="info2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/infoclasificacion"
+        android:layout_weight="1"
+        android:textAlignment="center" />
+</LinearLayout>
