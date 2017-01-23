@@ -17,7 +17,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         Controller controller = new Controller(this); //Objeto que escucha
+
+        BaseDatos baseDatos = new BaseDatos(this, "MyDB", null, 1);
+
+        Credentials user = new Credentials("prueba@ejemplo.com", "123456");
+
+        //baseDatos.addCredentials(user);// FALLA AQUI
 
         if(!loginchecker()) {
             Intent loginActivity = new Intent(this, LoginActivity.class);

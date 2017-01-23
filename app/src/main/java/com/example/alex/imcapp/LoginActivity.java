@@ -3,7 +3,9 @@ package com.example.alex.imcapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -48,6 +50,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     Handler setDelay;
     Runnable startDelay;
+    private BaseDatos baseDatos = new BaseDatos(this, "MyDB", null, 1);
+
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -104,7 +108,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-    }
+    } //Fin onCreate
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -165,6 +169,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
+        Credentials credentials = new Credentials(mEmailView.getText().toString(), mPasswordView.getText().toString());
+       /* if(baseDatos.findUser(credentials)){ //Si  coincide
+
+            delay();
+
+        }else {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Usuario no registrado. ¿Desea registrarse?")
+                    .setTitle("Alerta!")
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+            ;
+
+
+            builder.create();
+            builder.show();
+
+        } */
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -201,9 +235,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
 
+
+            delay();
         }
 
-        delay();
 
 
     }
