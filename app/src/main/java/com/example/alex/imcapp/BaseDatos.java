@@ -14,7 +14,8 @@ import java.util.List;
 
 public class BaseDatos extends SQLiteOpenHelper {
 
-    private static final String sqlCreacionTablaUsuario = "CREATE TABLE USER(email TEXT PRIMARY KEY, password TEXT)";
+    private static final String sqlCreacionTablaUsuario = "CREATE TABLE USER(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT PRIMARY KEY, password TEXT)";
+    //Primary key obligatorio!!!
 
     public  BaseDatos(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version){
 
@@ -43,7 +44,7 @@ public class BaseDatos extends SQLiteOpenHelper {
 
     public boolean findUser (Credentials credentials){
 
-        String consulta = "SELECT email FROM USER WHERE email = '" + credentials.getmEmail() + "'";
+        String consulta = "SELECT email FROM USER WHERE email = '" + credentials.getmEmail() + "'"; //Si consultas tambien contraseña y te devuelve es que existe
         //Quiero comprobar si el email que le paso existe en la base de datos
 
         SQLiteDatabase db = this.getReadableDatabase();

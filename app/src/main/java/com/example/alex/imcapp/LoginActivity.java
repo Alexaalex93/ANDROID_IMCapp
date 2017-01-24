@@ -266,7 +266,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             startActivity(toMainActivity);
             Toast toast =  Toast.makeText(getApplicationContext(),
-                            "Logged successfuly", Toast.LENGTH_SHORT);
+                            "Logged successfully", Toast.LENGTH_SHORT);
 
             toast.show();
 
