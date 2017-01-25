@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 
@@ -24,19 +25,32 @@ public class MainActivity extends AppCompatActivity {
 
         Credentials user = new Credentials("prueba@ejemplo.com", "123456");
 
-        //baseDatos.addCredentials(user);// FALLA AQUI
+        try {
+            baseDatos.addCredentials(user);
+        }catch (Throwable th){
+            Log.d(getClass().getCanonicalName(), "Falla al añadir" , th);
+        }
+        try {
+            Log.d(getClass().getCanonicalName(), "Basedata " + baseDatos.findUser(user.getmPassword(), user.getmPassword())+ " ");
+
+        }catch (Throwable th){
+            Log.d(getClass().getCanonicalName(), "Falla al llamar a la busqueda", th);
+
+        }
 
         if(!loginchecker()) {
+
             Intent loginActivity = new Intent(this, LoginActivity.class);
             startActivity(loginActivity);
-            //setContentView(R.layout.activity_login);
 
         }
         else {
+
             setContentView(R.layout.activity_main);
 
             Button calculatebtn = (Button) findViewById(R.id.calculateButton);
             calculatebtn.setOnClickListener(controller);
+
         }
     }
 

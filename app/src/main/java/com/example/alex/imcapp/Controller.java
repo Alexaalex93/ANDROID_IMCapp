@@ -34,22 +34,10 @@ public class Controller  implements View.OnClickListener   {
                 toInformationActivity();
 
                 break;
-            case R.id.email_sign_in_button:
-
-                functionChecker();
-
-                break;
-
-
-
-        }
+            }
     }
 
     void toActivity2(){
-        ///////////////////
-
-
-        ///////////////
 
         Activity activity1 = (Activity) this._contexto;
         EditText weightText = (EditText) activity1.findViewById(R.id.weightText);
@@ -87,9 +75,6 @@ public class Controller  implements View.OnClickListener   {
 
     }
 
-    void functionChecker() {
 
-
-    }
 
 }

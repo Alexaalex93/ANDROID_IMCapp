@@ -3,6 +3,7 @@ package com.example.alex.imcapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -75,7 +77,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    private int cont = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setDelay = new Handler();
@@ -169,36 +171,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
+        //Se puede quitar
         Credentials credentials = new Credentials(mEmailView.getText().toString(), mPasswordView.getText().toString());
-       /* if(baseDatos.findUser(credentials)){ //Si  coincide
-
-            delay();
-
-        }else {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Usuario no registrado. ¿Desea registrarse?")
-                    .setTitle("Alerta!")
-                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    })
-            ;
 
 
-            builder.create();
-            builder.show();
-
-        } */
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -232,11 +208,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
 
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            mAuthTask = new UserLoginTask(credentials); //Sobreescrito con credentials
+            mAuthTask.execute("Prueba");
 
-
-            delay();
         }
 
 
@@ -266,17 +240,53 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             startActivity(toMainActivity);
             Toast toast =  Toast.makeText(getApplicationContext(),
-                            "Logged successfully", Toast.LENGTH_SHORT);
+                            "Login successfully", Toast.LENGTH_SHORT);
 
             toast.show();
 
 
     }
 
+    private void userToAdd(){
+        //Metodo para registrar usuario
+        //TODO poner bien los botones
+        //TODO encriptacion de contraseña
+
+
+      final  Credentials credentials = new Credentials(mEmailView.getText().toString(), Codificar.codifica(mPasswordView.getText().toString()));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Usuario no registrado. ¿Desea registrarse?")
+                .setTitle("Alerta!")
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        baseDatos.addCredentials(credentials);
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                "Usuario registrado correctamente", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        builder.create();
+        builder.show();
+
+
+    }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+
+        if(email.contains("@") && (email.contains(".com") || email.contains((".es"))))
+            return true;
+         return false;
+
     }
 
     private boolean isPasswordValid(String password) {
@@ -378,49 +388,67 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<String, String, String> {
 
         private final String mEmail;
         private final String mPassword;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        UserLoginTask(Credentials credentials) {
+            mEmail = credentials.getmEmail();
+            mPassword = credentials.getmPassword();
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(String... state) {
             // TODO: attempt authentication against a network service.
 
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                return false;
+                return "-1";
             }
+            /////////////////METODO PARA VERIFICAR EXISTENCIA DE LA CUENTA
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
+            Log.d(getClass().getCanonicalName(), "Se mete en doInBackground()");
 
-            // TODO: register the new account here.
-            return true;
+            return Integer.toString(baseDatos.findUser(mEmail,Codificar.codifica(mPassword)));
+
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute( String state) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                finish();
+            if (state.equals("1")) {
+                logged();
+                Log.d(getClass().getCanonicalName(),"Concuerda email y contraseña");
+            } else if (state.equals("-1")){
+
+                Log.d(getClass().getCanonicalName(),"No concuerda nada");
+                userToAdd();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+                Log.d(getClass().getCanonicalName(),"Concuerda email pero no contraseña");
+                cont ++;
+                if(3 - cont == 1) {
+                    Toast toast = Toast.makeText(getApplicationContext(), 3 - cont +
+                            " intento restante", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else{
+                    Toast toast = Toast.makeText(getApplicationContext(), 3 - cont +
+                            " intentos restantes", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+
+                if(cont == 3){
+                    cont = 0;
+                    finishAffinity();
+                }
+
             }
         }
 
